@@ -4,25 +4,20 @@ import NetworkingInterface
 import Alamofire
 
 final class NetworkingTests: XCTestCase {
-    func testExample() async throws {
-        let factory: NetworkRequest = NetworkRequest()
-        let task1: NetworkRequestTask<[DogDTO]> = factory.makeDataTask()
-        let response: DataResponse<[DogDTO], AFError> = await task1.getResponse()
-        print(response)
-        XCTAssert(response.data != nil)
-    }
-
+    
     func testUseCase() async throws {
-        let factory: NetworkRequest = NetworkRequest()
-        let repository: any DogsRepositoryProtocol = DogsRepository(taskFactory: factory)
+        let interceptor = Interceptor(adapter: MyAdapter(), retrier: MyRetrier())
+        let decodableNetworkService = AFDecodableNetworkService<[DogDTO]>(interceptor: interceptor)
+        let repository: any DogsRepositoryProtocol = DogsRepository(httpClient: decodableNetworkService)
         let useCase: FetchDogsUseCase = FetchDogsUseCase(repository: repository)
         let dogs: [Dog] = try await useCase.execute(limit: 20, page: 0)
         XCTAssert(dogs.count == 20)
     }
 
     func testImage() async throws {
-        let factory: NetworkRequest = NetworkRequest()
-        let repository: any DogsRepositoryProtocol = DogsRepository(taskFactory: factory)
+        let interceptor = Interceptor(adapter: MyAdapter(), retrier: MyRetrier())
+        let dataNetworkService = AFDataNetworkService(interceptor: interceptor)
+        let repository: any DogsRepositoryProtocol = DogsRepository(httpClient: dataNetworkService)
         let useCase: FetchImageUseCase = FetchImageUseCase(repository: repository)
         let image: UIImage = try await useCase.execute(url: URL(string: "https://cdn2.thedogapi.com/images/Hyq1ge9VQ.jpg")!)
         XCTAssert(image.size.width == 800)

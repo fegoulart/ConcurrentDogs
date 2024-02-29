@@ -12,7 +12,21 @@ import Alamofire
 
 final class DogsRepositoryTests: XCTestCase {
 
+    override func setUp() {
+        super.setUp()
+        URLProtocol.registerClass(StubUrlProtocol.self)
+    }
+
+    override func tearDown() {
+        super.tearDown()
+        URLProtocol.unregisterClass(StubUrlProtocol.self)
+    }
+
     func testExample() async throws {
+        StubUrlProtocol.observer = { request -> (URLResponse?, Data?) in
+            return (HTTPURLResponse(url: URL(string: "https://lalala.com")!, statusCode: 200, httpVersion: nil, headerFields: nil), "[ { \"id\": 1, \"name\": \"Beagle\", \"image\": {\"id\": \"lalala\", \"url\": \"https://hahaha.com\"}}, { \"id\": 2, \"name\": \"Doberman\", \"image\": {\"id\": \"lelele\", \"url\": \"https://hehehehe.com\"}}]".data(using: .utf8)!)
+                }
+
         let sut = makeSUT(
             dogs: [
                 DogDTO(
@@ -50,60 +64,108 @@ final class DogsRepositoryTests: XCTestCase {
         file: StaticString = #file,
         line: UInt = #line
     ) -> DogsRepository {
-        let decodableTestTask = TestTask<[DogDTO]>(mockResult: dogs)
-        let decodableTask = NetworkRequestTask<[DogDTO]>(dataTask: decodableTestTask)
-        let dataTestTask = TestTask<Data>(mockResult: Data.make(withColor: .orange))
-        let dataTask = NetworkRequestTask(dataTask: dataTestTask)
-        let factory = TestTaskFactory(decodableTask: decodableTask, dataTask: dataTask)
-        let dogsRepository = DogsRepository(taskFactory: factory)
+        let configuration = URLSessionConfiguration.af.ephemeral
+        configuration.protocolClasses = [StubUrlProtocol.self] + (configuration.protocolClasses ?? [])
+        let session = Alamofire.Session(configuration: configuration)
+        // let interceptor = Interceptor(adapter: MyAdapter(), retrier: MyRetrier())
+        //let decodableNetworkService = AFDecodableNetworkService<[DogDTO]>(interceptor: interceptor)
+        // let dataNetworkService = AFDataNetworkService(interceptor: interceptor)
+        // let httpClient = AFNetworkService(dataService: dataNetworkService, decodableService: decodableNetworkService)
+        let httpClient = TestHttpClient(dogs: dogs, data: image, session: session)
+        let dogsRepository = DogsRepository(httpClient: httpClient)
         return dogsRepository
     }
+
+    /*
+     private func makeSUT(file: StaticString = #filePath, line: UInt = #line) -> HTTPClient {
+         let configuration = URLSessionConfiguration.ephemeral
+         configuration.protocolClasses = [URLProtocolStub.self]
+         let session = URLSession(configuration: configuration)
+
+         let sut = URLSessionHTTPClient(session: session)
+         trackForMemoryLeaks(sut, file: file, line: line)
+         return sut
+     }
+     */
 }
 
-final class TestTask<Value>: DogTask {
-    let mockResult: Value
-    var cancelCount = 0
+class StubUrlProtocol: URLProtocol {
+    static var observer: ((URLRequest) throws -> (URLResponse?, Data?))?
 
-    var response: Alamofire.DataResponse<Value, Alamofire.AFError> {
-        get async {
-            return DataResponse.init(
-                request: nil,
-                response: nil,
-                data: nil,
-                metrics: nil,
-                serializationDuration: .zero,
-                result: .success(mockResult))
+    override class func canInit(with request: URLRequest) -> Bool {
+        return true
+    }
+
+    override class func canInit(with task: URLSessionTask) -> Bool {
+        return true
+    }
+
+    override class func canonicalRequest(for request: URLRequest) -> URLRequest {
+        request
+    }
+
+    override func startLoading() {
+        do {
+            self.client?.urlProtocol(self, didReceive: HTTPURLResponse(), cacheStoragePolicy: .allowed)
+
+            guard let (response, data) = try Self.observer?(request) else {
+                return
+            }
+            if let response {
+                client?.urlProtocol(self, didReceive: response, cacheStoragePolicy: .notAllowed)
+            }
+            if let data {
+                client?.urlProtocol(self, didLoad: data)
+            }
+
+            client?.urlProtocolDidFinishLoading(self)
+        } catch {
+            client?.urlProtocol(self, didFailWithError: error)
         }
     }
 
-    typealias T = Value
+    override func stopLoading() { }
+}
 
-    init(mockResult: Value) {
-        self.mockResult = mockResult
+final class TestHttpClient: HTTPClient {
+    var dataResponse: Data = Data()
+    var dogsDTOResponse: [DogDTO] = []
+    let session: Session
+
+    init(dogs: [DogDTO], data: Data, session: Session) {
+        dataResponse = data
+        dogsDTOResponse = dogs
+        self.session = session
     }
 
-    func cancel() {
-        cancelCount += 1
+    func get<T>(url: String, parameters: [String : Any], _ type: T.Type) throws -> any HTTPClientTask {
+        if type == Data.self {
+            return session.request(url).serializingData()
+        }
+        if type == [DogDTO].self {
+            return session.request(url).serializingDecodable() as DataTask<[DogDTO]>
+        }
+        // FIXME: Create proper error
+        throw DogsError.invalidImageData
     }
 
 }
 
-final class TestTaskFactory: DataTaskAbstractFactory {
-    typealias T = [DogDTO]
-    
-    private var decodableTask: NetworkRequestTask<[DogDTO]>
-    private var dataTask: NetworkRequestTask<Data>
+struct TestDataTask<Value>: HTTPClientTask {
 
-    init(decodableTask: NetworkRequestTask<[DogDTO]>, dataTask: NetworkRequestTask<Data>) {
-        self.decodableTask = decodableTask
-        self.dataTask = dataTask
+    let response: Value
+
+    init(response: Value) {
+        self.response = response
     }
 
-    func makeDataTask(url: String, limit: Int, page: Int) -> NetworkRequestTask<T> {
-        return decodableTask as NetworkRequestTask<T>
+    func getResponse() async throws -> Value {
+        return response
     }
     
-    func makeImageDataTask(url: URL) -> NetworkRequestTask<Data> {
-        return dataTask
+    typealias T = Value
+
+    func cancel() {
+
     }
 }

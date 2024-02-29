@@ -9,7 +9,7 @@ import Foundation
 import NetworkingInterface
 import UIKit
 
-public class FetchImageUseCase: FetchImageUseCaseProtocol {
+public class FetchImageUseCase: FetchDogImageUseCaseProtocol {
     public typealias DogImage = UIImage
     let repository: any DogsRepositoryProtocol
 

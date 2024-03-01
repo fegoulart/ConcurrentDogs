@@ -46,9 +46,8 @@ public actor DogsRepository: DogsRepositoryProtocol {
 
     public func fetchImage(url: URL) async throws -> UIImage {
         guard fetchImageTasks[url.absoluteString] == nil else {
-            assertionFailure("not expected")
-            // FIXME: Create a proper error
-            throw DogsError.invalidImageData
+            // assertionFailure("not expected")
+            throw DogsError.taskAlreadyExists
         }
         let task: DataTask<Data> = try httpClient.get(url: url.absoluteString, parameters: [:], Data.self) as! DataTask<Data>
         fetchImageTasks[url.absoluteString] = task
@@ -63,5 +62,13 @@ public actor DogsRepository: DogsRepositoryProtocol {
         case .failure(let error):
             throw error
         }
+    }
+
+    public func cancelImageRequest(url: URL) async throws {
+        guard let task = fetchImageTasks[url.absoluteString] else {
+            //assertionFailure("not expected")
+            throw DogsError.couldNotFindTaskToCancel
+        }
+        task.cancel()
     }
 }

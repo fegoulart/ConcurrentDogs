@@ -23,10 +23,10 @@ public final class AFNetworkService: HTTPClient {
         if type == Data.self {
             return try dataService.get(url: url, parameters: parameters, Data.self)
         }
-        if type == Decodable.self {
+        // if type == Decodable.self {
             return try decodableService.get(url: url, parameters: parameters, T.self)
-        }
+        //}
         // FIXME: Create a more appropriate error
-        throw DogsError.invalidImageData
+        //throw DogsError.invalidImageData
     }
 }

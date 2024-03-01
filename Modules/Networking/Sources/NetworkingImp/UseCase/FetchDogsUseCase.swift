@@ -8,7 +8,7 @@
 import Foundation
 import NetworkingInterface
 
-public class FetchDogsUseCase: FetchDogsUseCaseProtocol {
+public actor FetchDogsUseCase: FetchDogsUseCaseProtocol {
 
     let repository: any DogsRepositoryProtocol
 

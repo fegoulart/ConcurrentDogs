@@ -12,4 +12,5 @@ public protocol DogsRepositoryProtocol {
 
     func fetchDogs(limit: Int, page: Int) async throws -> [Dog]
     func fetchImage(url: URL) async throws -> DogImage
+    func cancelImageRequest(url: URL) async throws
 }

@@ -9,4 +9,6 @@ import Foundation
 
 public enum DogsError: Error {
     case invalidImageData
+    case couldNotFindTaskToCancel
+    case taskAlreadyExists
 }

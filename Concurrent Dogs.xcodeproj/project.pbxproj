@@ -3,10 +3,12 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 56;
+	objectVersion = 60;
 	objects = {
 
 /* Begin PBXBuildFile section */
+		192988A82B912CDE00E28BC0 /* NetworkingImp in Frameworks */ = {isa = PBXBuildFile; productRef = 192988A72B912CDE00E28BC0 /* NetworkingImp */; };
+		192988AA2B912CDE00E28BC0 /* NetworkingInterface in Frameworks */ = {isa = PBXBuildFile; productRef = 192988A92B912CDE00E28BC0 /* NetworkingInterface */; };
 		19D47D4E2B8F890000A3D70E /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19D47D4D2B8F890000A3D70E /* AppDelegate.swift */; };
 		19D47D502B8F890000A3D70E /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19D47D4F2B8F890000A3D70E /* SceneDelegate.swift */; };
 		19D47D522B8F890000A3D70E /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19D47D512B8F890000A3D70E /* ViewController.swift */; };
@@ -56,6 +58,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				192988AA2B912CDE00E28BC0 /* NetworkingInterface in Frameworks */,
+				192988A82B912CDE00E28BC0 /* NetworkingImp in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -143,6 +147,10 @@
 			dependencies = (
 			);
 			name = "Concurrent Dogs";
+			packageProductDependencies = (
+				192988A72B912CDE00E28BC0 /* NetworkingImp */,
+				192988A92B912CDE00E28BC0 /* NetworkingInterface */,
+			);
 			productName = "Concurrent Dogs";
 			productReference = 19D47D4A2B8F890000A3D70E /* Concurrent Dogs.app */;
 			productType = "com.apple.product-type.application";
@@ -215,6 +223,9 @@
 				Base,
 			);
 			mainGroup = 19D47D412B8F890000A3D70E;
+			packageReferences = (
+				192988A62B912CDE00E28BC0 /* XCLocalSwiftPackageReference "Modules/Networking" */,
+			);
 			productRefGroup = 19D47D4B2B8F890000A3D70E /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -496,6 +507,7 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 26J6YQJ489;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.2;
 				MARKETING_VERSION = 1.0;
@@ -515,6 +527,7 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 26J6YQJ489;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.2;
 				MARKETING_VERSION = 1.0;
@@ -601,6 +614,24 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		192988A62B912CDE00E28BC0 /* XCLocalSwiftPackageReference "Modules/Networking" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = Modules/Networking;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		192988A72B912CDE00E28BC0 /* NetworkingImp */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = NetworkingImp;
+		};
+		192988A92B912CDE00E28BC0 /* NetworkingInterface */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = NetworkingInterface;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 19D47D422B8F890000A3D70E /* Project object */;
 }

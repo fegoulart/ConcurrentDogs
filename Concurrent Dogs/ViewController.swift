@@ -136,7 +136,7 @@ final class ViewController: UIViewController {
         dogsTableView.dataSource = self
         dogsTableView.prefetchDataSource = self
         Task {
-            await viewModel?.fetchNext()
+            try await viewModel?.fetchNext()
             dogsTableView.reloadData()
         }
     }
@@ -160,17 +160,21 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource, UITableVie
         let currentLastIndex = viewModel?.dogsCellController.count ?? 0
         if indexPath.item == (viewModel?.dogsCellController.count ?? 0) - 1 {
             Task {
-                await viewModel?.fetchNext()
-                guard let numberOfRows = viewModel?.dogsCellController.count, numberOfRows > currentLastIndex else {
-                    return
+                do {
+                    try await viewModel?.fetchNext()
+                    guard let numberOfRows = viewModel?.dogsCellController.count, numberOfRows > currentLastIndex else {
+                        return
+                    }
+                    print("inserting new rows from: \(currentLastIndex) to \(numberOfRows)")
+                    tableView.beginUpdates()
+                    for i in currentLastIndex..<numberOfRows {
+                        tableView.insertRows(at: [IndexPath(row: i, section: 0)], with: .automatic)
+                    }
+                    tableView.endUpdates()
+                    // dogsTableView.reloadData()
+                } catch (let error){
+                    print(error.localizedDescription)
                 }
-                print("inserting new rows from: \(currentLastIndex) to \(numberOfRows)")
-                tableView.beginUpdates()
-                for i in currentLastIndex..<numberOfRows {
-                    tableView.insertRows(at: [IndexPath(row: i, section: 0)], with: .automatic)
-                }
-                tableView.endUpdates()
-                // dogsTableView.reloadData()
             }
         }
     }
@@ -202,6 +206,12 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource, UITableVie
     }
 }
 
+public enum DogsTableViewState {
+    case reloadingAllData
+    case normal
+    case fetchingNextPage
+}
+
 @MainActor
 public class ViewModel: ObservableObject {
 
@@ -210,6 +220,7 @@ public class ViewModel: ObservableObject {
     let cancelImageUseCase: any CancelDogImageRequestUseCaseProtocol
     var currentPage = -1
     let limitPerPage = 20
+    var tableViewState: DogsTableViewState = .normal
     @Published var dogsCellController: [CellController] = []
     @Published var errorMessage: String = ""
 
@@ -223,9 +234,11 @@ public class ViewModel: ObservableObject {
         self.cancelImageUseCase = cancelImageUseCase
     }
 
-    public func fetchNext() async {
+    public func fetchNext() async throws {
         do {
+            guard tableViewState == .normal else { throw DogsError.invalidState }
             currentPage += 1
+            tableViewState = currentPage == 0 ? .reloadingAllData : .fetchingNextPage
             let newData = try await fetchDogUseCase.execute(limit: limitPerPage, page: currentPage)
             guard !newData.isEmpty else {
                 currentPage -= 1
@@ -238,8 +251,10 @@ public class ViewModel: ObservableObject {
                     cancelImageRequest: cancelImageUseCase
                 )
             }
+            tableViewState = .normal
         } catch (let error) {
             errorMessage = "deu ruim \(error.localizedDescription)"
+            tableViewState = .normal
         }
     }
 }

@@ -7,7 +7,7 @@
 
 import Foundation
 
-public struct Dog: Equatable {
+public struct Dog: Equatable, Sendable {
     public var breed: String
     public var image: String
 

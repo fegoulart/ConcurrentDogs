@@ -7,6 +7,6 @@
 
 import Foundation
 
-public protocol FetchDogsUseCaseProtocol {
+public protocol FetchDogsUseCaseProtocol: Sendable {
     func execute(limit: Int, page: Int) async throws -> [Dog]
 }

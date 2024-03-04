@@ -8,7 +8,7 @@
 import Foundation
 
 public protocol FetchDogImageUseCaseProtocol {
-    associatedtype DogImage
+    associatedtype DogImage: Sendable
 
     func execute(url: URL) async throws -> DogImage
 }

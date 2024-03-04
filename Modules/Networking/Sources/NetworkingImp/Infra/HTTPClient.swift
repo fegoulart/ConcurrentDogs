@@ -7,6 +7,6 @@
 
 import Foundation
 
-public protocol HTTPClient {
+public protocol HTTPClient: Sendable {
     func get<T>(url: String, parameters: [String: Any], _ type: T.Type) throws -> any HTTPClientTask
 }

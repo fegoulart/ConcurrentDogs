@@ -15,6 +15,10 @@ final class DogImagesViewController: UIViewController {
 
     @IBOutlet weak var dogsCollectionView: UICollectionView!
 
+    @IBOutlet weak var collectionViewFlowLayout: UICollectionViewFlowLayout!
+
+    let cellsPerRow = 3
+
     lazy var interceptor: Interceptor = {
         Interceptor(adapter: MyAdapter(), retrier: MyRetrier())
     }()
@@ -38,13 +42,29 @@ final class DogImagesViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+
         dogsCollectionView.dataSource = self
         dogsCollectionView.delegate = self
+        dogsCollectionView?.contentInsetAdjustmentBehavior = .always
+        
+        collectionViewFlowLayout?.minimumInteritemSpacing = 10
+        collectionViewFlowLayout?.minimumLineSpacing = 10
+        collectionViewFlowLayout?.sectionInset = UIEdgeInsets(top: 10, left: 10, bottom: 10, right: 10)
+        collectionViewFlowLayout?.itemSize = CGSize(width: 50, height: 50)
+        collectionViewFlowLayout?.estimatedItemSize = CGSize(width: 110, height: 110)
+        dogsCollectionView.collectionViewLayout = collectionViewFlowLayout
+        dogsCollectionView.register(DogImageCell.self, forCellWithReuseIdentifier: "dogImageCell")
+        dogsCollectionView.setNeedsLayout()
+    
         Task {
             try await viewModel.fetchImages()
+            self.dogsCollectionView.reloadData()
         }
     }
 
+    override func viewWillLayoutSubviews() {
+        collectionViewFlowLayout?.itemSize = CGSize(width: 110, height: 110)
+    }
 }
 
 extension DogImagesViewController: UICollectionViewDataSource {
@@ -61,6 +81,8 @@ extension DogImagesViewController: UICollectionViewDataSource {
     }
 }
 
-extension DogImagesViewController: UICollectionViewDelegate {
-
+extension DogImagesViewController: UICollectionViewDelegateFlowLayout {
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        return .init(width: 110, height: 110)
+    }
 }

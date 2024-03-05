@@ -5,7 +5,6 @@
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22504"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
-        <capability name="collection view cell content view" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -20,36 +19,13 @@
                             <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="o0c-sh-6nb">
                                 <rect key="frame" x="0.0" y="59" width="393" height="710"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
-                                <collectionViewFlowLayout key="collectionViewLayout" automaticEstimatedItemSize="YES" minimumLineSpacing="10" minimumInteritemSpacing="10" id="r4y-cN-AQN">
-                                    <size key="itemSize" width="128" height="128"/>
+                                <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="10" minimumInteritemSpacing="10" id="r4y-cN-AQN">
+                                    <size key="itemSize" width="50" height="50"/>
                                     <size key="headerReferenceSize" width="0.0" height="0.0"/>
                                     <size key="footerReferenceSize" width="0.0" height="0.0"/>
                                     <inset key="sectionInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
                                 </collectionViewFlowLayout>
-                                <cells>
-                                    <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="dogImageCell" id="SWM-5z-pD6" customClass="DogImageCell" customModule="Concurrent_Dogs" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="0.0" width="127.99999999999997" height="128"/>
-                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                        <collectionViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" id="zWO-Ys-mRp">
-                                            <rect key="frame" x="0.0" y="0.0" width="127.99999999999997" height="128"/>
-                                            <autoresizingMask key="autoresizingMask"/>
-                                            <subviews>
-                                                <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="67C-Qq-grc">
-                                                    <rect key="frame" x="-56" y="0.0" width="240" height="128"/>
-                                                </imageView>
-                                            </subviews>
-                                            <constraints>
-                                                <constraint firstItem="67C-Qq-grc" firstAttribute="centerY" secondItem="zWO-Ys-mRp" secondAttribute="centerY" id="4hA-fh-BB3"/>
-                                                <constraint firstItem="67C-Qq-grc" firstAttribute="width" secondItem="zWO-Ys-mRp" secondAttribute="width" multiplier="1.875" id="5m5-bn-QI2"/>
-                                                <constraint firstItem="67C-Qq-grc" firstAttribute="centerX" secondItem="zWO-Ys-mRp" secondAttribute="centerX" id="VIb-5b-1nM"/>
-                                                <constraint firstItem="67C-Qq-grc" firstAttribute="height" secondItem="zWO-Ys-mRp" secondAttribute="height" id="Yli-Tv-SMJ"/>
-                                            </constraints>
-                                        </collectionViewCellContentView>
-                                        <connections>
-                                            <outlet property="dogImageView" destination="67C-Qq-grc" id="rI1-4K-8J3"/>
-                                        </connections>
-                                    </collectionViewCell>
-                                </cells>
+                                <cells/>
                             </collectionView>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="dE5-5C-H1g"/>
@@ -63,6 +39,7 @@
                     </view>
                     <tabBarItem key="tabBarItem" title="CollectionView" image="ruler" catalog="system" id="eFE-Cb-t43"/>
                     <connections>
+                        <outlet property="collectionViewFlowLayout" destination="r4y-cN-AQN" id="tqD-PP-crU"/>
                         <outlet property="dogsCollectionView" destination="o0c-sh-6nb" id="O27-jH-oX4"/>
                     </connections>
                 </viewController>
